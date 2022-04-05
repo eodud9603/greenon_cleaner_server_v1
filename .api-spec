@@ -1,0 +1,110 @@
+[펌웨어 -> 미들웨어 요청]
+
+1. 디바이스 초기 상태
+   POST /device/init
+      body {
+         deviceId: string
+         payload: {
+            power: number
+            mode: number
+            mode_time: number
+            is_working: number
+            rm_area_bacteria: number
+            pest_control: number
+            water_level: number
+            chemical_level: number
+         }
+      }
+		
+2. 디바이스 구성 상태 동기화 (5초마다 보고)
+	POST /device/report-configs
+      body {
+         deviceId: string
+         payload: {
+            power: number
+            mode: number
+            mode_time: number
+            is_working: number
+            rm_area_bacteria: number
+            pest_control: number
+            water_level: number
+            chemical_level: number
+         }
+      }
+
+3. 수위/약품 상태 동기화 (5초마다 보고)
+	POST /device/report-water-and-chemical-level
+      body {
+         deviceId: string
+         payload: {
+            water_level: number
+            chemical_level: number
+         }
+      }
+
+4. 디바이스 가동 상태 (미세먼지, 온도, 습도 등) (10분마다 보고)
+	POST /device/report-status
+      body {
+         deviceId: string
+         payload: {
+            particulate_matter: number // 미세먼지
+            temperature: number // 온도
+            humidity: number // 습도
+            bio_aerosol: number // 바이오 에어로졸
+            air_quality: number // 공기질
+            food_poisoning: number // 식중독 지수
+            hydrogen_sulfide: number
+            ammonia: number
+            voc: number
+            co2: number
+         }
+      }
+
+5. 디바이스 연결 상태 (5초마다 보고)
+POST Device Health Check (5초)
+	POST /device/report-sync
+      body {
+         deviceId: string
+      }
+
+6. 미들웨어에서 명령 받아오기 (5초마다 요청)
+	GET /device/:deviceId/configs
+
+
+[프론트 -> 미들웨어 요청]
+
+1. 제품 등록 (미정)
+   POST /admin/device-register
+   {
+      userId: string
+      deviceId: string
+   }
+
+2. 디바이스에 명령 보내기
+   POST /admin/device-command
+      body {
+         deviceId: string
+         payload: {
+            // 아래 필드 중 하나만 포함할 것
+            power?: number
+            mode?: number
+            mode_time?: number
+            is_working?: number
+            rm_area_bacteria?: number
+            pest_control?: number
+            water_level?: number
+            chemical_level?: number
+         }
+      }
+
+3. 디바이스 연결 상태 확인 (15초)
+   GET /admin/device-connection/:deviceId
+
+4. 디바이스 가동 상태 (미세먼지, 온도, 습도 등)
+   GET /admin/device-status/:deviceId
+		
+5. 디바이스 수위/약품 상태 (5초)
+   GET /admin/device-water-and-chemical-level/:deviceId
+
+6. 디바이스 구성 상태 (10초)
+   GET /admin/device-configs/:deviceId
