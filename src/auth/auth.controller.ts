@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Body, Param, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Req, Patch, HttpCode } from '@nestjs/common';
 import { Request } from 'express';
 import { AuthService } from './auth.service';
 import { SignInDto } from './dto/sign-in.dto';
 import { SignUpDto } from './dto/sign-up.dto';
+import { UpdateAuthDto } from './dto/update-auth.dto';
+import { verifyPasswrodDto } from './dto/verify-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -21,6 +23,16 @@ export class AuthController {
   @Post('signup')
   signup (@Body() body:SignUpDto) {
     return this.authService.signup(body);
+  }
+
+  @Patch(':userId/update')
+  updateUserInfo (@Body() body:UpdateAuthDto, @Param('userId') userId:number) {
+    return this.authService.updateUserInfo(userId, body);
+  }
+  @Post(':userId/verify-password')
+  @HttpCode(200)
+  verifyPasswrod (@Body() body:verifyPasswrodDto, @Param('userId') userId:number) {
+    return this.authService.verifyPassword(userId, body.password);
   }
 
   @Post('signup/kakao')

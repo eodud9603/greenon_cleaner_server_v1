@@ -97,6 +97,20 @@ export class DeviceController {
     return this.deviceService.getConfigs(deviceId);
   }
 
+  /* app */
+  // 시리얼번호 검증
+  @ApiTags('프론트(앱) → 시리얼번호 조회')
+  @Post('verify-serial')
+  verifySerial (@Body('serial') serial:string) {
+    return this.deviceService.verifySerial(serial);
+  }
+
+  /* temp: 임시 시리얼번호 등록 */
+  // @Post('bulk')
+  // bulkInsert () {
+  //   return this.deviceService.bulkInsert();
+  // }
+
   /* front */
 
   // 유저 디바이스 불러오기

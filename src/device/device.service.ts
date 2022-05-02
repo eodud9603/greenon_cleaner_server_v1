@@ -9,6 +9,7 @@ import { ReportDeviceSyncDto } from './dto/report-device-sync.dto';
 import { SyncDeviceDto } from './dto/sync-device.dto';
 import { Device } from './entities/device.entity';
 import { DeviceConfig } from './entities/deviceConfig.entity';
+import { DeviceSerial } from './entities/deviceSerial.entity';
 import { DeviceStatus } from './entities/deviceStatus.entity';
 
 const getRandom = (min:number, max:number) => {
@@ -28,6 +29,8 @@ export class DeviceService {
     private readonly deviceStatusRepo: Repository<DeviceStatus>,
     @InjectRepository(DeviceConfig)
     private readonly deviceConfigRepo: Repository<DeviceConfig>,
+    @InjectRepository(DeviceSerial)
+    private readonly deviceSerialRepo: Repository<DeviceSerial>,
   ) { }
 
   async init(data: SyncDeviceDto) {
@@ -52,14 +55,16 @@ export class DeviceService {
 
   async reportConfigs(data: ReportDeviceConfigDto) {
     let result = true;
-    const { deviceId, payload } = data;
+    const { userId, deviceId, payload } = data;
+
     const queryRunner = this.connection.createQueryRunner();
 
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
-      await queryRunner.manager.update(Device, deviceId, payload);
+      // await queryRunner.manager.update(Device, deviceId, { ...payload, userId });
+      await queryRunner.manager.upsert(Device, [{ id: deviceId, serial: deviceId, ...payload, userId }], ['id']);
       await queryRunner.commitTransaction();
     } catch (e) {
       await queryRunner.rollbackTransaction();
@@ -152,6 +157,33 @@ export class DeviceService {
     } finally {
       await queryRunner.release();
       return configList;
+    }
+  }
+
+  /* app */
+  async verifySerial (serial:string) {
+    const verified = await this.deviceSerialRepo.findOne(serial);
+
+    if (verified) return { result: true };
+    else return { result: false };
+  }
+
+  async bulkInsert () {
+    const queryRunner = this.connection.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      for (let i = 1; i <= 100; i++) {
+        await queryRunner.manager.save(DeviceSerial, { serial: `ABT1000-${('0000' + i).slice(-4)}` });
+      }
+      await queryRunner.commitTransaction();
+    } catch (e) {
+      await queryRunner.rollbackTransaction();
+    } finally {
+      await queryRunner.release();
+      return true;
     }
   }
 

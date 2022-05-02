@@ -10,6 +10,7 @@ import * as FormData from 'form-data';
 import aligoapi from 'aligoapi';
 import { Request } from 'express';
 import * as qs from 'qs';
+import { UpdateAuthDto } from './dto/update-auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -23,7 +24,7 @@ export class AuthService {
   async signin (data:SignInDto) {
     const user = await this.userRepo.findOne({
       where: { ...data },
-      select: ['id', 'isAdmin', 'name']
+      select: ['id', 'isAdmin', 'name', 'email', 'phone']
     });
     
     return { user };
@@ -32,7 +33,7 @@ export class AuthService {
   async signinWithKakao (kakaoId:string) {
     const user = await this.userRepo.findOne({
       where: { kakaoId },
-      select: ['id', 'isAdmin', 'name', 'email']
+      select: ['id', 'isAdmin', 'name', 'email', 'phone']
     });
     
     return { user };
@@ -76,6 +77,31 @@ export class AuthService {
       await queryRunner.release();
       return isSuccess;
     }
+  }
+
+  async updateUserInfo (userId:number, payload:UpdateAuthDto) {
+    let result = { isSuccess: true, affected: 0 };
+    const queryRunner = this.connection.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const update = await queryRunner.manager.update(User, { id: userId }, payload);
+      result.affected = update.affected || 0;
+      await queryRunner.commitTransaction();
+    } catch (e) {
+      await queryRunner.rollbackTransaction();
+      result.isSuccess = false;
+    } finally {
+      await queryRunner.release();
+      return result;
+    }
+  }
+
+  async verifyPassword (userId:number, password:string) {
+    const verified = await this.userRepo.count({ password, id: userId });
+    return { result: !!verified };
   }
 
   async sendSmsCode (phone:string, req:Request) {
