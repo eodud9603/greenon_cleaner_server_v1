@@ -22,6 +22,7 @@ export class AuthService {
   ) { }
 
   async signin (data:SignInDto) {
+    console.log(123123);
     const user = await this.userRepo.findOne({
       where: { ...data },
       select: ['id', 'isAdmin', 'name', 'email', 'phone']
@@ -184,6 +185,31 @@ export class AuthService {
       await queryRunner.commitTransaction();
     } catch (e) {
       await queryRunner.rollbackTransaction();
+    } finally {
+      await queryRunner.release();
+      return result;
+    }
+  }
+
+  async findEmail (phone:string) {
+    const result = await this.userRepo.find({ where: { phone }, select: ['email'] });
+    return result.map(r => r.email);
+  }
+
+  async changePassword (email:string, phone:string, password:string) {
+    let result = { isSuccess: true, affected: 0 };
+    const queryRunner = this.connection.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const update = await queryRunner.manager.update(User, { email, phone }, { password });
+      result.affected = update.affected || 0;
+      await queryRunner.commitTransaction();
+    } catch (e) {
+      await queryRunner.rollbackTransaction();
+      result.isSuccess = false;
     } finally {
       await queryRunner.release();
       return result;

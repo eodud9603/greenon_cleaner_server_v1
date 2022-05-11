@@ -48,4 +48,14 @@ export class AuthController {
   verifySmsCode (@Body () body:{ phone:string, code:string }) {
     return this.authService.verifySmsCode(body.phone, body.code);
   }
+
+  @Post('/find-email')
+  findEmail (@Body () body:{ phone:string }) {
+    return this.authService.findEmail(body.phone);
+  }
+  // 비밀번호 찾기: sms 인증 이후 이메일 있는지만 확인
+  @Post('/change-password')
+  changePassword (@Body () body:{ email:string, phone:string, password:string }) {
+    return this.authService.changePassword(body.email, body.phone, body.password);
+  }
 }
