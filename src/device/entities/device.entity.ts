@@ -10,7 +10,7 @@ export class Device {
    @Column({ default: null }) userId: number;
    @Column({ default: /* null */'사용자 지정 이름' }) name: string; // 사용자 지정 명칭
    @Column({ default: /* null */'AT-153B' }) serial: string; // 제품번호
-   @Column({ default: /* null */'공기청정제균기' }) type: string; // 기기 종류
+   @Column({ default: /* null */'공간해충살균기' }) type: string; // 기기 종류
 
    // 디바이스 명령 상태
    @Column({ default: 0 }) power: number; // 전원 (1: 켜짐, 0: 꺼짐)
