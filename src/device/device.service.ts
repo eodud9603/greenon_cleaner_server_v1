@@ -114,7 +114,7 @@ export class DeviceService {
       await queryRunner.rollbackTransaction();
       console.log('device report status fail ::',{ deviceId, ...payload });
       console.log('data',data);
-      console.log('query runner :: ',queryRunner);
+      // console.log('query runner :: ',queryRunner);
       console.log(e);
       result = false;
     } finally {
