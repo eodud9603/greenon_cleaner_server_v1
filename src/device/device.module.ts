@@ -8,8 +8,15 @@ import { DeviceConfig } from './entities/deviceConfig.entity';
 import { DeviceSerial } from './entities/deviceSerial.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Device, DeviceConfig, DeviceStatus, DeviceSerial])],
+  imports: [
+    TypeOrmModule.forFeature([
+      Device,
+      DeviceConfig,
+      DeviceStatus,
+      DeviceSerial,
+    ]),
+  ],
   controllers: [DeviceController],
-  providers: [DeviceService]
+  providers: [DeviceService],
 })
 export class DeviceModule {}

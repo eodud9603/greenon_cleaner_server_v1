@@ -6,12 +6,12 @@ export class NoticeController {
   constructor(private readonly noticeService: NoticeService) {}
 
   @Get()
-  getAll () {
+  getAll() {
     return this.noticeService.getAll();
   }
 
   @Get(':id')
-  getOne (@Param('id') id:number) {
+  getOne(@Param('id') id: number) {
     return this.noticeService.getOne(id);
   }
 

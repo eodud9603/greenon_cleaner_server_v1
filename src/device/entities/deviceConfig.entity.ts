@@ -1,13 +1,22 @@
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn, UpdateDateColumn } from "typeorm";
-import { Device } from "./device.entity";
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { Device } from './device.entity';
 
 @Entity()
 export class DeviceConfig {
-   @PrimaryColumn()
-   deviceId: string;
-   @PrimaryColumn()
-   command: string; // 명령
-   /* 
+  @PrimaryColumn()
+  deviceId: string;
+  @PrimaryColumn()
+  command: string; // 명령
+  /* 
       명령 타입
       power
       mode
@@ -16,16 +25,19 @@ export class DeviceConfig {
       rm_area_bacteria
       pest_control
    */
-   @Column()
-   value: number;
+  @Column()
+  value: number;
 
-   @UpdateDateColumn()
-   createdAt: Date;
+  @UpdateDateColumn()
+  createdAt: Date;
 
-   @DeleteDateColumn()
-   deletedAt: Date;
+  @DeleteDateColumn()
+  deletedAt: Date;
 
-   @ManyToOne(() => Device, device => device.configs, { onUpdate: 'CASCADE' , onDelete: 'CASCADE' })
-   @JoinColumn({ name: 'deviceId' })
-   device: Device
+  @ManyToOne(() => Device, (device) => device.configs, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'deviceId' })
+  device: Device;
 }

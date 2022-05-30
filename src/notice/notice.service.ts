@@ -9,18 +9,18 @@ export class NoticeService {
     private connection: Connection,
 
     @InjectRepository(Notice)
-    private readonly noticeRepo: Repository<Notice>
-  ) { }
-  
-  getAll () {
+    private readonly noticeRepo: Repository<Notice>,
+  ) {}
+
+  getAll() {
     return this.noticeRepo.find();
   }
 
-  getOne (id:number) {
+  getOne(id: number) {
     return this.noticeRepo.findOne({ where: { id } });
   }
 
-  // async 
+  // async
 
   /* create(createNoticeDto: CreateNoticeDto) {
     return 'This action adds a new notice';

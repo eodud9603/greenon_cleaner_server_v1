@@ -12,11 +12,11 @@ import { DeviceConfig } from './entities/deviceConfig.entity';
 import { DeviceSerial } from './entities/deviceSerial.entity';
 import { DeviceStatus } from './entities/deviceStatus.entity';
 
-const getRandom = (min:number, max:number) => {
+const getRandom = (min: number, max: number) => {
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1)) + min; //최댓값도 포함, 최솟값도 포함
-}
+};
 
 @Injectable()
 export class DeviceService {
@@ -31,7 +31,7 @@ export class DeviceService {
     private readonly deviceConfigRepo: Repository<DeviceConfig>,
     @InjectRepository(DeviceSerial)
     private readonly deviceSerialRepo: Repository<DeviceSerial>,
-  ) { }
+  ) {}
 
   async init(data: SyncDeviceDto) {
     let result = true;
@@ -42,7 +42,11 @@ export class DeviceService {
     await queryRunner.startTransaction();
 
     try {
-      await queryRunner.manager.upsert(Device, [{ id: deviceId, ...payload }], ['id']);
+      await queryRunner.manager.upsert(
+        Device,
+        [{ id: deviceId, ...payload }],
+        ['id'],
+      );
       await queryRunner.commitTransaction();
     } catch (e) {
       await queryRunner.rollbackTransaction();
@@ -64,7 +68,11 @@ export class DeviceService {
 
     try {
       // await queryRunner.manager.update(Device, deviceId, { ...payload, userId });
-      await queryRunner.manager.upsert(Device, [{ id: deviceId, serial: deviceId, ...payload, userId }], ['id']);
+      await queryRunner.manager.upsert(
+        Device,
+        [{ id: deviceId, serial: deviceId, ...payload, userId }],
+        ['id'],
+      );
       await queryRunner.commitTransaction();
     } catch (e) {
       await queryRunner.rollbackTransaction();
@@ -126,7 +134,9 @@ export class DeviceService {
     await queryRunner.startTransaction();
 
     try {
-      await queryRunner.manager.update(Device, deviceId, { updatedAt: new Date() });
+      await queryRunner.manager.update(Device, deviceId, {
+        updatedAt: new Date(),
+      });
       await queryRunner.commitTransaction();
     } catch (e) {
       await queryRunner.rollbackTransaction();
@@ -141,7 +151,7 @@ export class DeviceService {
   async getConfigs(deviceId: string) {
     const configList = await this.deviceConfigRepo.find({
       where: { deviceId },
-      select: ['command', 'value']
+      select: ['command', 'value'],
     });
 
     const queryRunner = this.connection.createQueryRunner();
@@ -161,14 +171,14 @@ export class DeviceService {
   }
 
   /* app */
-  async verifySerial (serial:string) {
+  async verifySerial(serial: string) {
     const verified = await this.deviceSerialRepo.findOne(serial);
 
     if (verified) return { result: true };
     else return { result: false };
   }
 
-  async bulkInsert () {
+  async bulkInsert() {
     const queryRunner = this.connection.createQueryRunner();
 
     await queryRunner.connect();
@@ -176,7 +186,9 @@ export class DeviceService {
 
     try {
       for (let i = 1; i <= 100; i++) {
-        await queryRunner.manager.save(DeviceSerial, { serial: `ABT1000-${('0000' + i).slice(-4)}` });
+        await queryRunner.manager.save(DeviceSerial, {
+          serial: `ABT1000-${('0000' + i).slice(-4)}`,
+        });
       }
       await queryRunner.commitTransaction();
     } catch (e) {
@@ -190,19 +202,30 @@ export class DeviceService {
   getUserDevices(userId: number) {
     return this.deviceRepo.find({
       where: { userId },
-      order: { 'createdAt': 'DESC' },
-      select: ['id', 'name', 'serial', 'type', 'power', 'mode', 'mode_time', 'is_working', 'water_level', 'chemical_level']
+      order: { createdAt: 'DESC' },
+      select: [
+        'id',
+        'name',
+        'serial',
+        'type',
+        'power',
+        'mode',
+        'mode_time',
+        'is_working',
+        'water_level',
+        'chemical_level',
+      ],
     });
   }
 
   async getUserDevicesCurrentStatus(userId: number) {
     const devices = await this.getUserDevices(userId);
-    let result = {};
+    const result = {};
     for (let i = 0; i < devices.length; i++) {
       const deviceId = devices[i].id;
       const status = await this.deviceStatusRepo.findOne({
         where: { deviceId },
-        order: { 'createdAt': 'DESC' }
+        order: { createdAt: 'DESC' },
       });
       result[deviceId] = status;
     }
@@ -210,15 +233,20 @@ export class DeviceService {
   }
 
   async getUserDeviceStatus(id: string, userId: number) {
-    let result = await this.deviceRepo.createQueryBuilder('device')
+    const result = await this.deviceRepo
+      .createQueryBuilder('device')
       .where({ id, userId })
-      .leftJoinAndSelect('device.status', 'status', 'DATE_FORMAT(status.createdAt, "%Y-%m-%d") = CURDATE()')
+      .leftJoinAndSelect(
+        'device.status',
+        'status',
+        'DATE_FORMAT(status.createdAt, "%Y-%m-%d") = CURDATE()',
+      )
       .getMany();
 
-    return result.map(r => {
+    return result.map((r) => {
       return {
         ...r,
-        status: r.status.map(s => {
+        status: r.status.map((s) => {
           return {
             createdAt: s.createdAt,
             particulate_matter: s.particulate_matter,
@@ -232,24 +260,28 @@ export class DeviceService {
             voc: s.voc,
             co2: s.co2,
           };
-        })
+        }),
       };
     });
   }
 
-  async getUserDeviceConfigs (userId:number) {
+  async getUserDeviceConfigs(userId: number) {
     return this.deviceRepo.find({ where: { userId } });
   }
 
   async registerUserDevice(id: string, userId: number) {
-    let result = { isSuccess: true, affected: 0 };
+    const result = { isSuccess: true, affected: 0 };
     const queryRunner = this.connection.createQueryRunner();
 
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
-      const update = await queryRunner.manager.update(Device, { id, userId: IsNull() }, { userId });
+      const update = await queryRunner.manager.update(
+        Device,
+        { id, userId: IsNull() },
+        { userId },
+      );
       result.affected = update.affected || 0;
       await queryRunner.commitTransaction();
     } catch (e) {
@@ -262,14 +294,18 @@ export class DeviceService {
   }
 
   async unregisterUserDevice(id: string, userId: number) {
-    let result = { isSuccess: true, affected: 0 };
+    const result = { isSuccess: true, affected: 0 };
     const queryRunner = this.connection.createQueryRunner();
 
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
-      const update = await queryRunner.manager.update(Device, { id, userId }, { userId: null });
+      const update = await queryRunner.manager.update(
+        Device,
+        { id, userId },
+        { userId: null },
+      );
       result.affected = update.affected || 0;
       await queryRunner.commitTransaction();
     } catch (e) {
@@ -291,17 +327,25 @@ export class DeviceService {
     await queryRunner.startTransaction();
 
     try {
-      const targetDevice = await queryRunner.manager.count(Device, { where: { id, userId } });
+      const targetDevice = await queryRunner.manager.count(Device, {
+        where: { id, userId },
+      });
 
       if (targetDevice === 1) {
         const configs = Object.keys(payload);
 
         for (const config of configs) {
-          await queryRunner.manager.upsert(DeviceConfig, [{ deviceId: id, command: config, value: payload[config] }], ['deviceId', 'command'])
+          await queryRunner.manager
+            .upsert(
+              DeviceConfig,
+              [{ deviceId: id, command: config, value: payload[config] }],
+              ['deviceId', 'command'],
+            )
             .then(async () => {
               await queryRunner.manager.update(Device, id, { [config]: 99 });
               resultArr.push(config);
-            }).catch(e => { });
+            })
+            .catch((e) => {});
         }
       }
       await queryRunner.commitTransaction();
@@ -312,7 +356,6 @@ export class DeviceService {
       return resultArr;
     }
   }
-
 
   // // 디바이스 더미 데이터 생성
   // /*

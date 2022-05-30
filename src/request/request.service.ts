@@ -7,7 +7,7 @@ import { Request } from './entities/request.entity';
 
 @Injectable()
 export class RequestService {
-  constructor (
+  constructor(
     private connection: Connection,
     @InjectRepository(Request)
     private readonly requestRepo: Repository<Request>,

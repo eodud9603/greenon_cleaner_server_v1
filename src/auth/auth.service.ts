@@ -18,36 +18,40 @@ export class AuthService {
     private connection: Connection,
 
     @InjectRepository(User)
-    private readonly userRepo: Repository<User>
-  ) { }
+    private readonly userRepo: Repository<User>,
+  ) {}
 
-  async signin (data:SignInDto) {
+  async signin(data: SignInDto) {
     console.log(123123);
     const user = await this.userRepo.findOne({
       where: { ...data },
-      select: ['id', 'isAdmin', 'name', 'email', 'phone']
+      select: ['id', 'isAdmin', 'name', 'email', 'phone'],
     });
-    
+
     return { user };
   }
 
-  async signinWithKakao (kakaoId:string) {
+  async signinWithKakao(kakaoId: string) {
     const user = await this.userRepo.findOne({
       where: { kakaoId },
-      select: ['id', 'isAdmin', 'name', 'email', 'phone']
+      select: ['id', 'isAdmin', 'name', 'email', 'phone'],
     });
-    
+
     return { user };
   }
 
-  async signup (data:SignUpDto) {
+  async signup(data: SignUpDto) {
     let isSuccess = true;
     const queryRunner = this.connection.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
-      const insertData = await queryRunner.manager.create(User, { email: data.email, password: data.password, phone: null });
+      const insertData = await queryRunner.manager.create(User, {
+        email: data.email,
+        password: data.password,
+        phone: null,
+      });
 
       await queryRunner.manager.save(insertData);
       await queryRunner.commitTransaction();
@@ -60,14 +64,18 @@ export class AuthService {
     }
   }
 
-  async signupWithKakao (data:{ id:string, email:string, nickname:string }) {
+  async signupWithKakao(data: { id: string; email: string; nickname: string }) {
     let isSuccess = true;
     const queryRunner = this.connection.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
-      const insertData = await queryRunner.manager.create(User, { email: data.email, kakaoId: data.id, name: data.nickname });
+      const insertData = await queryRunner.manager.create(User, {
+        email: data.email,
+        kakaoId: data.id,
+        name: data.nickname,
+      });
 
       await queryRunner.manager.save(insertData);
       await queryRunner.commitTransaction();
@@ -80,15 +88,19 @@ export class AuthService {
     }
   }
 
-  async updateUserInfo (userId:number, payload:UpdateAuthDto) {
-    let result = { isSuccess: true, affected: 0 };
+  async updateUserInfo(userId: number, payload: UpdateAuthDto) {
+    const result = { isSuccess: true, affected: 0 };
     const queryRunner = this.connection.createQueryRunner();
 
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
-      const update = await queryRunner.manager.update(User, { id: userId }, payload);
+      const update = await queryRunner.manager.update(
+        User,
+        { id: userId },
+        payload,
+      );
       result.affected = update.affected || 0;
       await queryRunner.commitTransaction();
     } catch (e) {
@@ -100,16 +112,16 @@ export class AuthService {
     }
   }
 
-  async verifyPassword (userId:number, password:string) {
+  async verifyPassword(userId: number, password: string) {
     const verified = await this.userRepo.count({ password, id: userId });
     return { result: !!verified };
   }
 
-  async sendSmsCode (phone:string, req:Request) {
+  async sendSmsCode(phone: string, req: Request) {
     let result = true;
 
     // Generate Random Code
-    let verifyCode = "";
+    let verifyCode = '';
     for (let i = 0; i < 6; i++) {
       verifyCode += parseInt((Math.random() * 10).toString()).toString();
     }
@@ -119,7 +131,17 @@ export class AuthService {
     await queryRunner.startTransaction();
 
     try {
-      await queryRunner.manager.upsert(Sms, [{ phone, code: verifyCode, expireAt: new Date(Date.now() + (3 * 60000)) }], ['phone']);
+      await queryRunner.manager.upsert(
+        Sms,
+        [
+          {
+            phone,
+            code: verifyCode,
+            expireAt: new Date(Date.now() + 3 * 60000),
+          },
+        ],
+        ['phone'],
+      );
 
       /* req.body = {
         sender: process.env.SMS_SENDER,
@@ -145,7 +167,7 @@ export class AuthService {
       await axios({
         url: 'https://apis.aligo.in/send/',
         headers: {
-          'content-type': 'application/x-www-form-urlencoded;charset=utf-8'
+          'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
         },
         method: 'POST',
         data: qs.stringify({
@@ -153,11 +175,11 @@ export class AuthService {
           sender: process.env.SMS_SENDER,
           user_id: process.env.SMS_USER_ID,
           receiver: phone,
-          msg_type: "SMS",
+          msg_type: 'SMS',
           msg: `[그린온] SMS 인증번호 [${verifyCode}]`,
-        })
-      }).then(res => console.log(res));
-      
+        }),
+      }).then((res) => console.log(res));
+
       await queryRunner.commitTransaction();
     } catch (e) {
       result = false;
@@ -169,11 +191,11 @@ export class AuthService {
     }
   }
 
-  async verifySmsCode (phone:string, code:string) {
+  async verifySmsCode(phone: string, code: string) {
     const result = {
-      affected: 0
+      affected: 0,
     };
-    let isSuccess = true;
+    const isSuccess = true;
     const queryRunner = this.connection.createQueryRunner();
 
     await queryRunner.connect();
@@ -191,20 +213,27 @@ export class AuthService {
     }
   }
 
-  async findEmail (phone:string) {
-    const result = await this.userRepo.find({ where: { phone }, select: ['email'] });
-    return result.map(r => r.email);
+  async findEmail(phone: string) {
+    const result = await this.userRepo.find({
+      where: { phone },
+      select: ['email'],
+    });
+    return result.map((r) => r.email);
   }
 
-  async changePassword (email:string, phone:string, password:string) {
-    let result = { isSuccess: true, affected: 0 };
+  async changePassword(email: string, phone: string, password: string) {
+    const result = { isSuccess: true, affected: 0 };
     const queryRunner = this.connection.createQueryRunner();
 
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
-      const update = await queryRunner.manager.update(User, { email, phone }, { password });
+      const update = await queryRunner.manager.update(
+        User,
+        { email, phone },
+        { password },
+      );
       result.affected = update.affected || 0;
       await queryRunner.commitTransaction();
     } catch (e) {

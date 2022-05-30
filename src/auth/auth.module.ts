@@ -8,6 +8,6 @@ import { Sms } from './entities/sms.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([User, Sms])],
   controllers: [AuthController],
-  providers: [AuthService]
+  providers: [AuthService],
 })
 export class AuthModule {}

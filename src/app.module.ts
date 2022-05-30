@@ -1,6 +1,6 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 // .env 설정이 포함되어있으므로 import 순서 지킬 것
-import { ConfigurationModule } from './modules/configuration.module'; 
+import { ConfigurationModule } from './modules/configuration.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './modules/database.module';
@@ -18,9 +18,18 @@ import path, { join } from 'path';
 @Module({
   imports: [
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'static')
+      rootPath: join(__dirname, '..', 'static'),
     }),
-    ConfigurationModule, DatabaseModule, ScheduleModule.forRoot(), DeviceModule, AdminModule, UserModule, AuthModule, NoticeModule, RequestModule],
+    ConfigurationModule,
+    DatabaseModule,
+    ScheduleModule.forRoot(),
+    DeviceModule,
+    AdminModule,
+    UserModule,
+    AuthModule,
+    NoticeModule,
+    RequestModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

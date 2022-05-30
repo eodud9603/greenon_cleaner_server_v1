@@ -19,7 +19,7 @@ export class AdminService {
     private readonly deviceStatusRepo: Repository<DeviceStatus>,
     @InjectRepository(DeviceConfig)
     private readonly deviceConfigRepo: Repository<DeviceConfig>,
-  ) { }
+  ) {}
 
   /*
     * * * * * *
@@ -31,7 +31,7 @@ export class AdminService {
     | minutes
     seconds (optional)
   */
- /* 12:00AM on the first of every month */
+  /* 12:00AM on the first of every month */
   /* @Cron('0 0 1 * *')
   async flushDeletedRows () {
     const queryRunner = this.connection.createQueryRunner();
@@ -49,11 +49,11 @@ export class AdminService {
     }
   } */
 
-  async registerDevice (data:AdminDeviceRegisterDto) {
+  async registerDevice(data: AdminDeviceRegisterDto) {
     let isUpdated = false;
     const { userId, deviceId } = data;
     const queryRunner = this.connection.createQueryRunner();
-    
+
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
@@ -62,7 +62,7 @@ export class AdminService {
         where: { id: deviceId, userId: null },
       });
 
-      if (isDeviceExist === 1) {    
+      if (isDeviceExist === 1) {
         await queryRunner.manager.update(Device, deviceId, { userId });
         await queryRunner.commitTransaction();
         isUpdated = true;
@@ -75,7 +75,7 @@ export class AdminService {
     }
   }
 
-  async sendCommand (data:AdminDeviceCommandDto) {
+  async sendCommand(data: AdminDeviceCommandDto) {
     let isSuccess = true;
     const { deviceId, payload } = data;
 
@@ -88,12 +88,16 @@ export class AdminService {
     const value = payload[command];
 
     const queryRunner = this.connection.createQueryRunner();
-    
+
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
-      await queryRunner.manager.upsert(DeviceConfig, [{ deviceId, command, value, createdAt: new Date() }], ['deviceId', 'command']);
+      await queryRunner.manager.upsert(
+        DeviceConfig,
+        [{ deviceId, command, value, createdAt: new Date() }],
+        ['deviceId', 'command'],
+      );
       await queryRunner.commitTransaction();
     } catch (e) {
       await queryRunner.rollbackTransaction();
@@ -108,29 +112,29 @@ export class AdminService {
 
   // }
 
-  async getDeviceStatus (deviceId:string) {
+  async getDeviceStatus(deviceId: string) {
     const statusList = await this.deviceStatusRepo.find({
       where: { deviceId, deletedAt: null },
       order: { createdAt: 'ASC' },
       select: [
         'createdAt',
-        'particulate_matter', 
-        'temperature', 
-        'humidity', 
+        'particulate_matter',
+        'temperature',
+        'humidity',
         'bio_aerosol',
         'air_quality',
         'food_poisoning',
         'hydrogen_sulfide',
         'ammonia',
         'voc',
-        'co2'
-      ]
+        'co2',
+      ],
     });
 
     return statusList;
 
     // const queryRunner = this.connection.createQueryRunner();
-    
+
     // await queryRunner.connect();
     // await queryRunner.startTransaction();
 
@@ -143,14 +147,13 @@ export class AdminService {
     //   await queryRunner.release();
     //   return statusList;
     // }
-  };
-
+  }
 
   // async getDeviceWaterAndChemicalLevel (deviceId:string) {
 
   // }
 
-  async getDeviceConfigs (deviceId:string) {
+  async getDeviceConfigs(deviceId: string) {
     return await this.deviceRepo.find({
       where: { id: deviceId },
       select: [
@@ -161,7 +164,7 @@ export class AdminService {
         'is_working',
         'water_level',
         'chemical_level',
-      ]
+      ],
     });
   }
 }
