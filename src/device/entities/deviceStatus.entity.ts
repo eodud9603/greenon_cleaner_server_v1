@@ -1,13 +1,5 @@
-import {
-  Column,
-  CreateDateColumn,
-  DeleteDateColumn,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryColumn,
-} from 'typeorm';
-import { Device } from './device.entity';
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
+import { Device } from "./device.entity";
 
 @Entity()
 export class DeviceStatus {
@@ -42,10 +34,7 @@ export class DeviceStatus {
   @Column()
   co2: number;
 
-  @ManyToOne(() => Device, (device) => device.status, {
-    onUpdate: 'CASCADE',
-    onDelete: 'CASCADE',
-  })
+  @ManyToOne(() => Device, device => device.status, { onUpdate: 'CASCADE' , onDelete: 'CASCADE' })
   @JoinColumn({ name: 'deviceId' })
-  device: Device;
+  device: Device
 }

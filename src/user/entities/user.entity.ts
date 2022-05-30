@@ -1,5 +1,5 @@
-import { Device } from 'src/device/entities/device.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Device } from "src/device/entities/device.entity";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class User {
@@ -13,6 +13,6 @@ export class User {
 
   @Column({ default: null, unique: true }) kakaoId: string;
 
-  @OneToMany(() => Device, (device) => device.owner)
+  @OneToMany(() => Device, device => device.owner)
   devices: Device[];
 }
