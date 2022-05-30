@@ -9,6 +9,6 @@ import { DeviceStatus } from 'src/device/entities/deviceStatus.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([Device, DeviceConfig, DeviceStatus])],
   controllers: [AdminController],
-  providers: [AdminService],
+  providers: [AdminService]
 })
 export class AdminModule {}

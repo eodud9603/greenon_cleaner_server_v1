@@ -1,10 +1,10 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Sms {
-  @PrimaryGeneratedColumn('uuid') phone: string;
+   @PrimaryGeneratedColumn('uuid') phone: string;
 
-  @Column() code: string;
+   @Column() code: string;
 
-  @Column({ type: 'datetime' }) expireAt: Date;
+   @Column({ type: 'datetime' }) expireAt: Date
 }

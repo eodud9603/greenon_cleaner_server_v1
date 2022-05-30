@@ -1,15 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  UploadedFile,
-  UseInterceptors,
-  Bind,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, UseInterceptors, Bind } from '@nestjs/common';
 import { RequestService } from './request.service';
 import { CreateRequestDto } from './dto/create-request.dto';
 import { UpdateRequestDto } from './dto/update-request.dto';
@@ -28,21 +17,17 @@ export class RequestController {
   @Post()
   @UseInterceptors(FileInterceptor('image', multerDiskOptions))
   @Bind(UploadedFile())
-  create(
+  create (
     @UploadedFile() file: File,
-    @Body()
-    data: {
+    @Body () data:{
       username: string;
       phone: string;
       email: string;
       title: string;
       content: string;
-    },
+    }
   ) {
-    return this.requestService.create({
-      ...data,
-      ...(file && { image: file.filename }),
-    });
+    return this.requestService.create({ ...data, ...(file && { image: file.filename }) });
   }
 
   /* @Post()
