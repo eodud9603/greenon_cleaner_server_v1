@@ -106,9 +106,13 @@ export class DeviceService {
 
     try {
       await queryRunner.manager.save(DeviceStatus, { deviceId, ...payload });
+      console.log('======================================================================');
+      console.log('device report status success ::',{ deviceId, ...payload });
+      console.log('======================================================================');
       await queryRunner.commitTransaction();
     } catch (e) {
       await queryRunner.rollbackTransaction();
+      console.log('device report status fail ::',{ deviceId, ...payload });
       console.log(e);
       result = false;
     } finally {
