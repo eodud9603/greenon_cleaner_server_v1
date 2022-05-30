@@ -9,7 +9,7 @@ const typeorm = TypeOrmModule.forRoot({
    password: process.env.DATABASE_PASSWORD,
    database: process.env.DATABASE_DB,
    autoLoadEntities: true,
-   synchronize: true // for development. Better run `yarn typeorm schema:sync`
+   synchronize: false // for development. Better run `yarn typeorm schema:sync`
 });
 
 @Module({
