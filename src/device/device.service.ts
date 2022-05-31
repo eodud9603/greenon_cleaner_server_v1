@@ -105,14 +105,14 @@ export class DeviceService {
     console.log('start :: ',await queryRunner.startTransaction());
 
     try {
-      await queryRunner.manager.save(DeviceStatus, { deviceId, ...payload });
-      console.log('======================================================================');
-      console.log('device report status success ::',{ deviceId, ...payload });
-      console.log('======================================================================');
+      await queryRunner.manager.save(DeviceStatus, { deviceId, ...payload },{ reload: false });
+      // console.log('======================================================================');
+      // console.log('device report status success ::',{ deviceId, ...payload });
+      // console.log('======================================================================');
       await queryRunner.commitTransaction();
     } catch (e) {
       await queryRunner.rollbackTransaction();
-      console.log('device report status fail ::',{ deviceId, ...payload });
+      // console.log('device report status fail ::',{ deviceId, ...payload });
       console.log(e);
       result = false;
     } finally {
