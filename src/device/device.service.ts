@@ -102,13 +102,10 @@ export class DeviceService {
     const queryRunner = this.connection.createQueryRunner();
 
     await queryRunner.connect();
-    console.log('start :: ',await queryRunner.startTransaction());
+    await queryRunner.startTransaction();
 
     try {
-      await queryRunner.manager.save(DeviceStatus, { deviceId, ...payload });
-      console.log('======================================================================');
-      console.log('device report status success ::',{ deviceId, ...payload });
-      console.log('======================================================================');
+      await queryRunner.manager.save(DeviceStatus, { deviceId, ...payload },{reload:false})
       await queryRunner.commitTransaction();
     } catch (e) {
       await queryRunner.rollbackTransaction();
