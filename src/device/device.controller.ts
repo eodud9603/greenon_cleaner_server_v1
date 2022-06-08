@@ -126,7 +126,13 @@ export class DeviceController {
   registerUserDevice (@Body() data: { id:string, userId:number }) {
     return this.deviceService.registerUserDevice(data.id, data.userId);
   }
-  
+
+  @ApiTags('프론트(관리자) → 미들웨어 요청 (유저별 데이터)')
+  @Patch(':deviceId/update')
+  updateUserDevice (@Body() body:{ name:string }, @Param('deviceId') deviceId:string) {
+    return this.deviceService.updateUserDevice(deviceId,body.name);
+  }
+
   @ApiTags('프론트(관리자) → 미들웨어 요청 (유저별 데이터)')
   @Post('user-device/unregister')
   unregisterUserDevice (@Body() data: { id:string, userId:number }) {

@@ -265,6 +265,26 @@ export class DeviceService {
     }
   }
 
+  async updateUserDevice(deviceId: string, name: string) {
+    let result = { isSuccess: true, affected: 0 };
+    const queryRunner = this.connection.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const update = await queryRunner.manager.update(Device, { id:deviceId }, { name : name });
+      result.affected = update.affected || 0;
+      await queryRunner.commitTransaction();
+    } catch (e) {
+      await queryRunner.rollbackTransaction();
+      result.isSuccess = false;
+    } finally {
+      await queryRunner.release();
+      return result;
+    }
+  }
+
   async unregisterUserDevice(id: string, userId: number) {
     let result = { isSuccess: true, affected: 0 };
     const queryRunner = this.connection.createQueryRunner();
