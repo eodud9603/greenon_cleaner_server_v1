@@ -219,6 +219,8 @@ export class DeviceService {
       .leftJoinAndSelect('device.status', 'status', 'DATE_FORMAT(status.createdAt, "%Y-%m-%d") = CURDATE()')
       .getMany();
 
+    console.log('getuser :: ',result);
+
     return result.map(r => {
       return {
         ...r,
@@ -239,6 +241,40 @@ export class DeviceService {
         })
       };
     });
+  }
+
+  //TODO:: 일,주,월 쿼리 작성 한 뒤 프론트에서 버튼 클릭 시 마다 api 호출
+  async getCumulativeData(id: string,type: string) {
+    let result;
+    if(type === 'day'){
+      result = await this.deviceStatusRepo.createQueryBuilder('status')
+        // .where(`deviceId = '${id}' and DATE_FORMAT(createdAt,"%Y-%m-%d") = CURDATE()`)
+        .select('status.*')
+        .where(`deviceId = '${id}' and createdAt BETWEEN DATE_ADD(NOW(),INTERVAL -1 DAY ) and NOW()`)
+        .getRawMany();
+    } else{
+      let query = ' and ';
+      if(type === 'week') query += 'createdAt BETWEEN DATE_ADD(NOW(),INTERVAL -1 WEEK ) and NOW()';
+      else if(type === 'month') query += 'createdAt BETWEEN DATE_ADD(NOW(),INTERVAL -1 MONTH ) and NOW()';
+      result = await this.deviceStatusRepo.createQueryBuilder('status')
+        .select('DATE_FORMAT(status.createdAt, "%Y-%m-%d") as createdAt')
+        .addSelect('sum(status.particulate_matter)/count(*) as particulate_matter')
+        .addSelect('sum(status.temperature)/count(*) as temperature')
+        .addSelect('sum(status.humidity)/count(*) as humidity')
+        .addSelect('sum(status.bio_aerosol)/count(*) as bio_aerosol')
+        .addSelect('sum(status.air_quality)/count(*) as air_quality')
+        .addSelect('sum(status.food_poisoning)/count(*) as food_poisoning')
+        .addSelect('sum(status.hydrogen_sulfide)/count(*) as hydrogen_sulfide')
+        .addSelect('sum(status.ammonia)/count(*) as ammonia')
+        .addSelect('sum(status.voc)/count(*) as voc')
+        .addSelect('sum(status.co2)/count(*) as co2')
+        .where(`deviceId = '${id}'${query}`)
+        .groupBy('DATE_FORMAT(createdAt, "%Y-%m-%d")')
+        .getRawMany();
+    }
+    // and DATE_FORMAT(createdAt, '%Y-%m-%d') <= CURDATE()
+    console.log(result);
+    return result;
   }
 
   async getUserDeviceConfigs (userId:number) {

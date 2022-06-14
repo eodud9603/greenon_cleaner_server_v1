@@ -166,4 +166,12 @@ export class DeviceController {
   getUserDeviceStatus (@Param('deviceId') id:string, @Query('userId') userId:number) {
     return this.deviceService.getUserDeviceStatus(id, userId);
   }
+
+  // 디바이스 누적데이터
+  @ApiTags('프론트(관리자) → 미들웨어 요청 (유저별 데이터)')
+  @Get('user-device/:deviceId/data')
+  getCumulativeData (@Param('deviceId') id:string, @Query('type') type:string) {
+    console.log('aa :: ',id);
+    return this.deviceService.getCumulativeData(id,type);
+  }
 }
