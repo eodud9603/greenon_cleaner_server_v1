@@ -35,10 +35,10 @@ export class AdminService {
   /* @Cron('0 0 1 * *')
   async flushDeletedRows () {
     const queryRunner = this.connection.createQueryRunner();
-    
+
     await queryRunner.connect();
     await queryRunner.startTransaction();
-    
+
     try {
       await queryRunner.manager.delete(DeviceConfig, { deletedAt: Not(IsNull()) });
       await queryRunner.manager.delete(DeviceStatus, { deletedAt: Not(IsNull()) });
@@ -53,7 +53,7 @@ export class AdminService {
     let isUpdated = false;
     const { userId, deviceId } = data;
     const queryRunner = this.connection.createQueryRunner();
-    
+
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
@@ -62,7 +62,7 @@ export class AdminService {
         where: { id: deviceId, userId: null },
       });
 
-      if (isDeviceExist === 1) {    
+      if (isDeviceExist === 1) {
         await queryRunner.manager.update(Device, deviceId, { userId });
         await queryRunner.commitTransaction();
         isUpdated = true;
@@ -88,7 +88,7 @@ export class AdminService {
     const value = payload[command];
 
     const queryRunner = this.connection.createQueryRunner();
-    
+
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
@@ -114,9 +114,9 @@ export class AdminService {
       order: { createdAt: 'ASC' },
       select: [
         'createdAt',
-        'particulate_matter', 
-        'temperature', 
-        'humidity', 
+        'particulate_matter',
+        'temperature',
+        'humidity',
         'bio_aerosol',
         'air_quality',
         'food_poisoning',
@@ -130,7 +130,7 @@ export class AdminService {
     return statusList;
 
     // const queryRunner = this.connection.createQueryRunner();
-    
+
     // await queryRunner.connect();
     // await queryRunner.startTransaction();
 
@@ -158,9 +158,9 @@ export class AdminService {
         'power',
         'mode',
         'mode_time',
-        'is_working',
+        'air_volume',
+        'air_quality',
         'water_level',
-        'chemical_level',
       ]
     });
   }

@@ -11,6 +11,6 @@ export class ReportDeviceWaterChemicalLevelDto {
 
    @ApiProperty()
    @ValidateNested({ each: true })
-   @Type(() => PickType(DeviceConfigDto, ['water_level', 'chemical_level'] as const))
-   payload: Pick<DeviceConfigDto, 'water_level'|'chemical_level'>;
+   @Type(() => PickType(DeviceConfigDto, ['water_level'] as const))
+   payload: Pick<DeviceConfigDto, 'water_level'>;
 }

@@ -88,7 +88,7 @@ export class DeviceController {
   @HttpCode(200)
   @ApiResponse({
     status: 200,
-    type: PartialType(OmitType(DeviceConfigDto, ['water_level', 'chemical_level'])),
+    type: PartialType(OmitType(DeviceConfigDto, ['water_level'])),
     isArray: true,
     description: '해당 펌웨어에 전달되는 명령을 { [명령타겟]: 값 } 배열 형태로 전달.<br/>주의: 배열 하나의 요소에 모든 명령이 들어가는 것이 아니라<br/>명령 하나 당 배열 요소 하나로 나열됨<br/>ex: [ { "power": 1 }, { "mode": 2 } ]<br/><br/>*변경이 된 데이터만 전달됨.',
   })

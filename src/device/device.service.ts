@@ -195,7 +195,7 @@ export class DeviceService {
     return this.deviceRepo.find({
       where: { userId },
       order: { 'createdAt': 'DESC' },
-      select: ['id', 'name', 'serial', 'type', 'power', 'mode', 'mode_time', 'is_working', 'water_level', 'chemical_level']
+      select: ['id', 'name', 'serial', 'type', 'power', 'mode', 'mode_time', 'air_volume', 'air_quality']
     });
   }
 
@@ -346,6 +346,8 @@ export class DeviceService {
 
     const { deviceId: id, userId, payload } = data;
     const queryRunner = this.connection.createQueryRunner();
+
+    console.log('deviceControl :: ',data);
 
     await queryRunner.connect();
     await queryRunner.startTransaction();
