@@ -99,6 +99,7 @@ export class DeviceService {
   async reportStatus(data: ReportDeviceStatusDto) {
     let result = true;
     const { deviceId, payload } = data;
+    console.log('report status :: ',data);
     const queryRunner = this.connection.createQueryRunner();
 
     await queryRunner.connect();
