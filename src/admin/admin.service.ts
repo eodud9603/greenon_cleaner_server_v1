@@ -52,6 +52,7 @@ export class AdminService {
   async registerDevice (data:AdminDeviceRegisterDto) {
     let isUpdated = false;
     const { userId, deviceId } = data;
+    console.log('register device :: ', data);
     const queryRunner = this.connection.createQueryRunner();
 
     await queryRunner.connect();
