@@ -13,26 +13,17 @@ export class DeviceStatus {
    deletedAt: Date;
 
    @Column()
-   particulate_matter: number; // 미세먼지
-   @Column()
    temperature: number; // 온도
    @Column()
    humidity: number; // 습도
    @Column()
-   bio_aerosol: number; // 바이오에어로졸
-   @Column()
-   air_quality: number; // 공기질
-   @Column()
-   food_poisoning: number; // 식중독 지수
-   
-   @Column()
-   hydrogen_sulfide: number;
-   @Column()
-   ammonia: number;
+   pm25: number; // 미세먼지
    @Column()
    voc: number;
    @Column()
    co2: number;
+   @Column()
+   cibai: number; // 바이오에어로졸
 
    @ManyToOne(() => Device, device => device.status, { onUpdate: 'CASCADE' , onDelete: 'CASCADE' })
    @JoinColumn({ name: 'deviceId' })

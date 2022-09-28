@@ -115,16 +115,12 @@ export class AdminService {
       order: { createdAt: 'ASC' },
       select: [
         'createdAt',
-        'particulate_matter',
         'temperature',
         'humidity',
-        'bio_aerosol',
-        'air_quality',
-        'food_poisoning',
-        'hydrogen_sulfide',
-        'ammonia',
+        'pm25',
         'voc',
-        'co2'
+        'co2',
+        'cibai'
       ]
     });
 

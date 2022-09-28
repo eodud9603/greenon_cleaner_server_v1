@@ -15,7 +15,7 @@
             chemical_level: number
          }
       }
-		
+
 2. 디바이스 구성 상태 동기화 (5초마다 보고)
 	POST /device/report-configs
       body {
@@ -47,16 +47,12 @@
       body {
          deviceId: string
          payload: {
-            particulate_matter: number // 미세먼지
             temperature: number // 온도
             humidity: number // 습도
-            bio_aerosol: number // 바이오 에어로졸
-            air_quality: number // 공기질
-            food_poisoning: number // 식중독 지수
-            hydrogen_sulfide: number
-            ammonia: number
+            pm25: number // 미세먼지
             voc: number
             co2: number
+            cibai: number // 바이오에어로졸
          }
       }
 
@@ -102,7 +98,7 @@ POST Device Health Check (5초)
 
 4. 디바이스 가동 상태 (미세먼지, 온도, 습도 등)
    GET /admin/device-status/:deviceId
-		
+
 5. 디바이스 수위/약품 상태 (5초)
    GET /admin/device-water-and-chemical-level/:deviceId
 
