@@ -156,7 +156,7 @@ export class AdminService {
         'mode',
         'mode_time',
         'air_volume',
-        'air_quality',
+        // 'air_quality',
         'water_level',
       ]
     });

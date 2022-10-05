@@ -1,8 +1,6 @@
-import { PartialType } from "@nestjs/mapped-types";
 import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
 import { IsNumber, IsOptional, IsString, ValidateNested } from "class-validator";
-import { IsNull } from "typeorm";
 import { DeviceConfigDto } from "./device-config.dto";
 
 export class ReportDeviceConfigDto {
