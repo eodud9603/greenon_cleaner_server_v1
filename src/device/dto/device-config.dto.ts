@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNumber } from "class-validator";
+import { IsNumber, IsOptional } from 'class-validator';
+import any = jasmine.any;
 
 export class DeviceConfigDto {
 
@@ -19,9 +20,10 @@ export class DeviceConfigDto {
    @ApiProperty({ description: '시간 (취침=0, 상시=1, 강속=2, 쾌속=3)', minimum: 0, maximum: 2 })
    air_volume: number;
 
-   // @IsNumber()
+   @IsOptional()
+   @IsNumber()
    @ApiProperty({ description: '수위 (정상=0, 물보충 요청=1)', minimum: 0, maximum: 1 })
-   water_level?: number | null;
+   water_level: number;
 
    // @IsNumber()
    // @ApiProperty({ description: '전원 (off=0, on=1)', minimum: 0, maximum: 1 })
