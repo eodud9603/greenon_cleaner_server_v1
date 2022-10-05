@@ -24,11 +24,7 @@
             power: number
             mode: number
             mode_time: number
-            is_working: number
-            rm_area_bacteria: number
-            pest_control: number
-            water_level: number
-            chemical_level: number
+            air_volume: number
          }
       }
 
