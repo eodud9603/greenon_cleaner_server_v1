@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNumber, IsOptional } from 'class-validator';
 import any = jasmine.any;
+import { ApiModelProperty } from '@nestjs/swagger/dist/decorators/api-model-property.decorator';
 
 export class DeviceConfigDto {
 
@@ -21,8 +22,9 @@ export class DeviceConfigDto {
    air_volume: number;
 
    @IsOptional()
+   // @ApiModelProperty({example : })
    @IsNumber()
-   @ApiProperty({ description: '수위 (정상=0, 물보충 요청=1)', minimum: 0, maximum: 1 })
+   @ApiProperty({ description: '수위 (정상=0, 물보충 요청=1) -> 필터 교체 알림 컬럼이므로 옵션인 컬럼(필수 x)', minimum: 0, maximum: 1, required: false })
    water_level: number;
 
    // @IsNumber()
