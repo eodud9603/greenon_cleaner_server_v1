@@ -61,6 +61,7 @@ export class DeviceService {
 
     await queryRunner.connect();
     await queryRunner.startTransaction();
+    console.log('data :: ',data);
 
     try {
       // await queryRunner.manager.update(Device, deviceId, { ...payload, userId });
