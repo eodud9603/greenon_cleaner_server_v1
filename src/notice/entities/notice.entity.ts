@@ -7,5 +7,6 @@ export class Notice {
    @Column({ type: 'text' }) content: string;
    @Column({ default: null }) imgUri: string;
    @Column({ default: 0 }) viewCount: number;
+   @Column({ default: 0 }) fix: number;
    @CreateDateColumn() createdAt: Date;
 }
