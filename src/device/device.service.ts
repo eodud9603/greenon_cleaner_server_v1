@@ -12,11 +12,11 @@ import { DeviceConfig } from './entities/deviceConfig.entity';
 import { DeviceSerial } from './entities/deviceSerial.entity';
 import { DeviceStatus } from './entities/deviceStatus.entity';
 
-const getRandom = (min:number, max:number) => {
+const getRandom = (min: number, max: number) => {
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1)) + min; //최댓값도 포함, 최솟값도 포함
-}
+};
 
 @Injectable()
 export class DeviceService {
@@ -31,7 +31,7 @@ export class DeviceService {
     private readonly deviceConfigRepo: Repository<DeviceConfig>,
     @InjectRepository(DeviceSerial)
     private readonly deviceSerialRepo: Repository<DeviceSerial>,
-  ) { }
+  ) {}
 
   async init(data: SyncDeviceDto) {
     let result = true;
@@ -42,7 +42,11 @@ export class DeviceService {
     await queryRunner.startTransaction();
 
     try {
-      await queryRunner.manager.upsert(Device, [{ id: deviceId, ...payload }], ['id']);
+      await queryRunner.manager.upsert(
+        Device,
+        [{ id: deviceId, ...payload }],
+        ['id'],
+      );
       await queryRunner.commitTransaction();
     } catch (e) {
       await queryRunner.rollbackTransaction();
@@ -61,11 +65,15 @@ export class DeviceService {
 
     await queryRunner.connect();
     await queryRunner.startTransaction();
-    console.log('data :: ',data);
+    console.log('data :: ', data);
 
     try {
       // await queryRunner.manager.update(Device, deviceId, { ...payload, userId });
-      await queryRunner.manager.upsert(Device, [{ id: deviceId, serial: deviceId, ...payload, userId }], ['id']);
+      await queryRunner.manager.upsert(
+        Device,
+        [{ id: deviceId, serial: deviceId, ...payload, userId }],
+        ['id'],
+      );
       await queryRunner.commitTransaction();
     } catch (e) {
       await queryRunner.rollbackTransaction();
@@ -100,14 +108,18 @@ export class DeviceService {
   async reportStatus(data: ReportDeviceStatusDto) {
     let result = true;
     const { deviceId, payload } = data;
-    console.log('report status :: ',data);
+    console.log('report status :: ', data);
     const queryRunner = this.connection.createQueryRunner();
 
     await queryRunner.connect();
-    console.log('start :: ',await queryRunner.startTransaction());
+    console.log('start :: ', await queryRunner.startTransaction());
 
     try {
-      await queryRunner.manager.save(DeviceStatus, { deviceId, ...payload },{ reload: false });
+      await queryRunner.manager.save(
+        DeviceStatus,
+        { deviceId, ...payload },
+        { reload: false },
+      );
       // console.log('======================================================================');
       // console.log('device report status success ::',{ deviceId, ...payload });
       // console.log('======================================================================');
@@ -132,7 +144,9 @@ export class DeviceService {
     await queryRunner.startTransaction();
 
     try {
-      await queryRunner.manager.update(Device, deviceId, { updatedAt: new Date() });
+      await queryRunner.manager.update(Device, deviceId, {
+        updatedAt: new Date(),
+      });
       await queryRunner.commitTransaction();
     } catch (e) {
       await queryRunner.rollbackTransaction();
@@ -147,7 +161,7 @@ export class DeviceService {
   async getConfigs(deviceId: string) {
     const configList = await this.deviceConfigRepo.find({
       where: { deviceId },
-      select: ['command', 'value']
+      select: ['command', 'value'],
     });
 
     const queryRunner = this.connection.createQueryRunner();
@@ -167,14 +181,14 @@ export class DeviceService {
   }
 
   /* app */
-  async verifySerial (serial:string) {
+  async verifySerial(serial: string) {
     const verified = await this.deviceSerialRepo.findOne(serial);
 
     if (verified) return { result: true };
     else return { result: false };
   }
 
-  async bulkInsert () {
+  async bulkInsert() {
     const queryRunner = this.connection.createQueryRunner();
 
     await queryRunner.connect();
@@ -182,7 +196,9 @@ export class DeviceService {
 
     try {
       for (let i = 1; i <= 100; i++) {
-        await queryRunner.manager.save(DeviceSerial, { serial: `ABT1000-${('0000' + i).slice(-4)}` });
+        await queryRunner.manager.save(DeviceSerial, {
+          serial: `ABT1000-${('0000' + i).slice(-4)}`,
+        });
       }
       await queryRunner.commitTransaction();
     } catch (e) {
@@ -196,19 +212,29 @@ export class DeviceService {
   getUserDevices(userId: number) {
     return this.deviceRepo.find({
       where: { userId },
-      order: { 'createdAt': 'DESC' },
-      select: ['id', 'name', 'serial', 'type', 'power', 'mode', 'mode_time', 'air_volume', 'air_quality']
+      order: { createdAt: 'DESC' },
+      select: [
+        'id',
+        'name',
+        'serial',
+        'type',
+        'power',
+        'mode',
+        'mode_time',
+        'air_volume',
+        'air_quality',
+      ],
     });
   }
 
   async getUserDevicesCurrentStatus(userId: number) {
     const devices = await this.getUserDevices(userId);
-    let result = {};
+    const result = {};
     for (let i = 0; i < devices.length; i++) {
       const deviceId = devices[i].id;
       const status = await this.deviceStatusRepo.findOne({
         where: { deviceId },
-        order: { 'createdAt': 'DESC' }
+        order: { createdAt: 'DESC' },
       });
       result[deviceId] = status;
     }
@@ -216,17 +242,22 @@ export class DeviceService {
   }
 
   async getUserDeviceStatus(id: string, userId: number) {
-    let result = await this.deviceRepo.createQueryBuilder('device')
+    const result = await this.deviceRepo
+      .createQueryBuilder('device')
       .where({ id, userId })
-      .leftJoinAndSelect('device.status', 'status', 'DATE_FORMAT(status.createdAt, "%Y-%m-%d") = CURDATE()')
+      .leftJoinAndSelect(
+        'device.status',
+        'status',
+        'DATE_FORMAT(status.createdAt, "%Y-%m-%d") = CURDATE()',
+      )
       .getMany();
 
-    console.log('getuser :: ',result);
+    console.log('getuser :: ', result);
 
-    return result.map(r => {
+    return result.map((r) => {
       return {
         ...r,
-        status: r.status.map(s => {
+        status: r.status.map((s) => {
           return {
             createdAt: s.createdAt,
             temperature: s.temperature,
@@ -236,25 +267,33 @@ export class DeviceService {
             co2: s.co2,
             cibai: s.cibai,
           };
-        })
+        }),
       };
     });
   }
 
   //TODO:: 일,주,월 쿼리 작성 한 뒤 프론트에서 버튼 클릭 시 마다 api 호출
-  async getCumulativeData(id: string,type: string) {
+  async getCumulativeData(id: string, type: string) {
     let result;
-    if(type === 'day'){
-      result = await this.deviceStatusRepo.createQueryBuilder('status')
+    if (type === 'day') {
+      result = await this.deviceStatusRepo
+        .createQueryBuilder('status')
         // .where(`deviceId = '${id}' and DATE_FORMAT(createdAt,"%Y-%m-%d") = CURDATE()`)
         .select('status.*')
-        .where(`deviceId = '${id}' and createdAt BETWEEN DATE_ADD(NOW(),INTERVAL -1 DAY ) and NOW()`)
+        .where(
+          `deviceId = '${id}' and createdAt BETWEEN DATE_ADD(NOW(),INTERVAL -1 DAY ) and NOW()`,
+        )
         .getRawMany();
-    } else{
+    } else {
       let query = ' and ';
-      if(type === 'week') query += 'createdAt BETWEEN DATE_ADD(NOW(),INTERVAL -1 WEEK ) and NOW()';
-      else if(type === 'month') query += 'createdAt BETWEEN DATE_ADD(NOW(),INTERVAL -1 MONTH ) and NOW()';
-      result = await this.deviceStatusRepo.createQueryBuilder('status')
+      if (type === 'week')
+        query +=
+          'createdAt BETWEEN DATE_ADD(NOW(),INTERVAL -1 WEEK ) and NOW()';
+      else if (type === 'month')
+        query +=
+          'createdAt BETWEEN DATE_ADD(NOW(),INTERVAL -1 MONTH ) and NOW()';
+      result = await this.deviceStatusRepo
+        .createQueryBuilder('status')
         .select('DATE_FORMAT(status.createdAt, "%Y-%m-%d") as createdAt')
         .addSelect('sum(status.temperature)/count(*) as temperature')
         .addSelect('sum(status.humidity)/count(*) as humidity')
@@ -271,19 +310,47 @@ export class DeviceService {
     return result;
   }
 
-  async getUserDeviceConfigs (userId:number) {
-    return this.deviceRepo.find({ where: { userId } });
+  async getUserDeviceConfigs(userId: number, sort: string) {
+    // return this.deviceRepo.find({
+    //   where: { userId },
+    //   order: order && { [order]: 'DESC' },
+    // });
+
+    return (
+      this.deviceRepo
+        .createQueryBuilder('device')
+        .select()
+        .where({ userId })
+        // .orderBy('device.power=1', 'DESC')
+        .orderBy(
+          sort === 'power'
+            ? 'device.power = 1'
+            : sort === 'water_level'
+            ? 'device.water_level = 1'
+            : sort === 'filter'
+            ? 'device.filter = 1'
+            : sort === 'mode'
+            ? 'device.mode = 1'
+            : 'device.createdAt',
+          'DESC',
+        )
+        .getMany()
+    );
   }
 
   async registerUserDevice(id: string, userId: number) {
-    let result = { isSuccess: true, affected: 0 };
+    const result = { isSuccess: true, affected: 0 };
     const queryRunner = this.connection.createQueryRunner();
 
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
-      const update = await queryRunner.manager.update(Device, { id, userId: IsNull() }, { userId });
+      const update = await queryRunner.manager.update(
+        Device,
+        { id, userId: IsNull() },
+        { userId },
+      );
       result.affected = update.affected || 0;
       await queryRunner.commitTransaction();
     } catch (e) {
@@ -296,14 +363,18 @@ export class DeviceService {
   }
 
   async updateUserDevice(deviceId: string, name: string) {
-    let result = { isSuccess: true, affected: 0 };
+    const result = { isSuccess: true, affected: 0 };
     const queryRunner = this.connection.createQueryRunner();
 
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
-      const update = await queryRunner.manager.update(Device, { id:deviceId }, { name : name });
+      const update = await queryRunner.manager.update(
+        Device,
+        { id: deviceId },
+        { name: name },
+      );
       result.affected = update.affected || 0;
       await queryRunner.commitTransaction();
     } catch (e) {
@@ -316,14 +387,18 @@ export class DeviceService {
   }
 
   async unregisterUserDevice(id: string, userId: number) {
-    let result = { isSuccess: true, affected: 0 };
+    const result = { isSuccess: true, affected: 0 };
     const queryRunner = this.connection.createQueryRunner();
 
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
-      const update = await queryRunner.manager.update(Device, { id, userId }, { userId: null });
+      const update = await queryRunner.manager.update(
+        Device,
+        { id, userId },
+        { userId: null },
+      );
       result.affected = update.affected || 0;
       await queryRunner.commitTransaction();
     } catch (e) {
@@ -338,26 +413,33 @@ export class DeviceService {
   async deviceControl(data: DeviceControlDto) {
     const resultArr = [];
 
+    console.log('deviceControl :: ', data);
     const { deviceId: id, userId, payload } = data;
     const queryRunner = this.connection.createQueryRunner();
-
-    console.log('deviceControl :: ',data);
 
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
-      const targetDevice = await queryRunner.manager.count(Device, { where: { id, userId } });
+      const targetDevice = await queryRunner.manager.count(Device, {
+        where: { id, userId },
+      });
 
       if (targetDevice === 1) {
         const configs = Object.keys(payload);
 
         for (const config of configs) {
-          await queryRunner.manager.upsert(DeviceConfig, [{ deviceId: id, command: config, value: payload[config] }], ['deviceId', 'command'])
+          await queryRunner.manager
+            .upsert(
+              DeviceConfig,
+              [{ deviceId: id, command: config, value: payload[config] }],
+              ['deviceId', 'command'],
+            )
             .then(async () => {
               await queryRunner.manager.update(Device, id, { [config]: 99 });
               resultArr.push(config);
-            }).catch(e => { });
+            })
+            .catch((e) => {});
         }
       }
       await queryRunner.commitTransaction();
@@ -368,7 +450,6 @@ export class DeviceService {
       return resultArr;
     }
   }
-
 
   // // 디바이스 더미 데이터 생성
   // /*
