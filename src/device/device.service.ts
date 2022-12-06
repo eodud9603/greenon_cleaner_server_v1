@@ -331,8 +331,10 @@ export class DeviceService {
             ? 'device.filter = 1'
             : sort === 'mode'
             ? 'device.mode = 1'
+            : sort === 'name'
+            ? 'device.name'
             : 'device.createdAt',
-          'DESC',
+          sort === 'name' ? 'ASC' : 'DESC',
         )
         .getMany()
     );
